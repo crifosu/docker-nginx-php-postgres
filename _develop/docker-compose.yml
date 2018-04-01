@@ -1,0 +1,52 @@
+version: '2'
+
+services:
+  main-web:
+      build: ./config/dockerfiles/nginx
+      volumes:
+          - ./../application/${PROJECT_NAME}:/var/www/vhosts/${PROJECT_NAME}
+          - ./config/site-symfony4.conf:/etc/nginx/conf.d/site.conf
+          - ./nginx/log:/var/log/nginx
+          - ./config/nginx.logrotate:/etc/logrotate.d/nginx
+      links:
+          - main-php
+      container_name: ${PROJECT_NAME}-web
+      networks:
+        main-net:
+          ipv4_address: ${PROJECT_IP_PREFIX}.15
+      restart: on-failure:10
+  main-php:
+      build: ./config/dockerfiles/php/dev
+      image: main/dev-php
+      volumes:
+          - ./../application/${PROJECT_NAME}:/var/www/vhosts/${PROJECT_NAME}
+          - /etc/localtime:/etc/localtime
+      container_name: ${PROJECT_NAME}-php
+      environment:
+          XDEBUG_CONFIG: remote_host=${PROJECT_IP_PREFIX}.1
+      working_dir: /var/www/vhosts/${PROJECT_NAME}/
+      networks:
+          - main-net
+      restart: on-failure:10
+
+  main-postgres:
+      image: postgres:10.3
+      container_name: ${PROJECT_NAME}-postgres
+      volumes:
+           - ./postgres/db:/var/lib/postgresql/data
+      environment:
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        - POSTGRES_DB=${POSTGRES_DB}
+      networks:
+          main-net:
+            ipv4_address: ${PROJECT_IP_PREFIX}.20
+
+networks:
+     main-net:
+        driver: bridge
+        ipam:
+          driver: default
+          config:
+          - subnet: ${PROJECT_IP_PREFIX}.0/24
+            gateway: ${PROJECT_IP_PREFIX}.1
