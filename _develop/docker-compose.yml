@@ -4,7 +4,7 @@ services:
   main-web:
       build: ./config/dockerfiles/nginx
       volumes:
-          - ./../application/${PROJECT_NAME}:/var/www/vhosts/${PROJECT_NAME}
+          - ./../${PROJECT_NAME}:/var/www/vhosts/symfony
           - ./config/site-symfony4.conf:/etc/nginx/conf.d/site.conf
           - ./nginx/log:/var/log/nginx
           - ./config/nginx.logrotate:/etc/logrotate.d/nginx
@@ -19,12 +19,12 @@ services:
       build: ./config/dockerfiles/php/dev
       image: main/dev-php
       volumes:
-          - ./../application/${PROJECT_NAME}:/var/www/vhosts/${PROJECT_NAME}
+          - ./../${PROJECT_NAME}:/var/www/vhosts/symfony
           - /etc/localtime:/etc/localtime
       container_name: ${PROJECT_NAME}-php
       environment:
           XDEBUG_CONFIG: remote_host=${PROJECT_IP_PREFIX}.1
-      working_dir: /var/www/vhosts/${PROJECT_NAME}/
+      working_dir: /var/www/vhosts/symfony/
       networks:
           - main-net
       restart: on-failure:10
