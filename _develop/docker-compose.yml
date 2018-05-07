@@ -5,7 +5,7 @@ services:
       build: ./config/dockerfiles/nginx
       volumes:
           - ./../${PROJECT_NAME}:/var/www/vhosts/symfony
-          - ./config/site-symfony4.conf:/etc/nginx/conf.d/site.conf
+          - ./config/site-symfony3.conf:/etc/nginx/conf.d/site.conf
           - ./nginx/log:/var/log/nginx
           - ./config/nginx.logrotate:/etc/logrotate.d/nginx
       links:
